@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Weather App</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-image: url('https://png.pngtree.com/thumb_back/fw800/background/20230515/pngtree-motion-animated-clouds-background-scene-image_2546867.jpg'); /* เปลี่ยน URL ตามต้องการ */
+      background-size: cover;
+      background-position: center;
+      height: 100vh;
+      display: flex;
+      justify-content: space-between;
+      color: white;
+    }
+
+    .weather-box {
+      width: 60%;
+      padding: 40px;
+      background: rgba(0,0,0,0.3);
+    }
+
+    .weather-box h1 {
+      font-size: 64px;
+      margin: 0;
+    }
+
+    .weather-box h2 {
+      margin: 10px 0;
+      font-size: 32px;
+    }
+
+    .weather-box p {
+      margin: 5px 0;
+    }
+
+    .sidebar {
+      width: 40%;
+      padding: 20px;
+      background: rgba(0,0,0,0.6);
+    }
+
+    .search-box {
+      display: flex;
+      margin-bottom: 20px;
+    }
+
+    .search-box input {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 5px 0 0 5px;
+      outline: none;
+    }
+
+    .search-box button {
+      padding: 10px 15px;
+      border: none;
+      background: orange;
+      border-radius: 0 5px 5px 0;
+      cursor: pointer;
+    }
+
+    .recent-search h3 {
+      margin-top: 0;
+    }
+
+    .recent-search ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .recent-search li {
+      cursor: pointer;
+      padding: 5px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+    }
+
+    footer {
+      margin-top: 20px;
+      font-size: 12px;
+      text-align: right;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="weather-box">
+    <h1 id="temp">--°C</h1>
+    <h2 id="city">Loading...</h2>
+    <p id="date">--</p>
+    <p id="desc">--</p>
+    <p id="humidity">Humidity: --</p>
+    <p id="wind">Wind: --</p>
+  </div>
+
+  <div class="sidebar">
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="Search here">
+      <button onclick="searchWeather()">Search</button>
+    </div>
+    <div class="recent-search">
+      <h3>Recent search</h3>
+      <ul id="recentList"></ul>
+    </div>
+    <footer>Developed by Mahfuzur Rahman</footer>
+  </div>
+
+  <script>
+    const apiKey = "51aa5f1f28fbc963708d597cba354ffc"; // 🔑 สมัครได้ที่ openweathermap.org
+    const recentList = document.getElementById("recentList");
+
+    async function fetchWeather(city = "") {
+      const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+      const res = await fetch(url);
+      const data = await res.json();
+
+      if (data.cod === "404") {
+        alert("City not found!");
+        return;
+      }
+
+      document.getElementById("temp").innerText = `${Math.round(data.main.temp)}°C`;
+      document.getElementById("city").innerText = data.name;
+      document.getElementById("date").innerText = new Date().toLocaleString();
+      document.getElementById("desc").innerText = data.weather[0].description;
+      document.getElementById("humidity").innerText = `Humidity: ${data.main.humidity}%`;
+      document.getElementById("wind").innerText = `Wind: ${data.wind.speed} km/h`;
+
+      addRecentSearch(city);
+    }
+
+    function searchWeather() {
+      const city = document.getElementById("searchInput").value;
+      if (city) fetchWeather(city);
+    }
+
+    function addRecentSearch(city) {
+      let li = document.createElement("li");
+      li.innerText = city;
+      li.onclick = () => fetchWeather(city);
+      recentList.prepend(li);
+    }
+
+    // โหลดเริ่มต้น
+    fetchWeather();
+  </script>
+</body>
+</html>
